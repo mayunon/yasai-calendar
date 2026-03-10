@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌱 野菜カレンダー</title>
+<title>🌱 Vegetable Calendar / 野菜カレンダー</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -12,147 +12,129 @@
     min-height: 100vh;
     padding: 16px;
   }
-  h1 { font-size: 22px; font-weight: 800; color: #14532d; margin: 4px 0 2px; }
-  .subtitle { font-size: 12px; color: #6b7280; }
-  header { text-align: center; margin-bottom: 20px; }
+  h1 { font-size: 20px; font-weight: 800; color: #14532d; margin: 4px 0 1px; }
+  h1 span { display: block; font-size: 13px; font-weight: 500; color: #6b7280; }
+  .subtitle { font-size: 11px; color: #9ca3af; }
+  header { text-align: center; margin-bottom: 16px; }
   header .icon { font-size: 36px; }
+
+  /* Lang toggle */
+  .lang-bar {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .lang-btn {
+    padding: 5px 16px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    background: #fff;
+    color: #6b7280;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .lang-btn.active {
+    background: #14532d;
+    border-color: #14532d;
+    color: #fff;
+    font-weight: 700;
+  }
 
   .tab-bar {
     display: flex;
     background: #e5e7eb;
     border-radius: 12px;
     padding: 3px;
-    max-width: 300px;
+    max-width: 320px;
     margin: 0 auto 16px;
   }
   .tab-btn {
-    flex: 1;
-    padding: 8px 0;
-    border: none;
-    border-radius: 10px;
-    font-size: 13px;
-    cursor: pointer;
-    background: transparent;
-    color: #6b7280;
-    font-weight: 400;
-    transition: all 0.2s;
+    flex: 1; padding: 8px 0; border: none; border-radius: 10px;
+    font-size: 13px; cursor: pointer; background: transparent;
+    color: #6b7280; font-weight: 400; transition: all 0.2s;
   }
   .tab-btn.active {
-    background: #fff;
-    color: #14532d;
-    font-weight: 700;
+    background: #fff; color: #14532d; font-weight: 700;
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   }
 
   .month-scroll {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
+    display: flex; gap: 5px; overflow-x: auto;
+    padding-bottom: 8px; margin-bottom: 14px;
   }
   .month-btn {
-    min-width: 52px;
-    padding: 8px 4px;
-    border: none;
-    border-radius: 12px;
-    font-size: 13px;
-    cursor: pointer;
-    background: #fff;
-    color: #374151;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    flex-shrink: 0;
-    transition: all 0.2s;
-    position: relative;
+    min-width: 48px; padding: 6px 4px; border: none; border-radius: 10px;
+    font-size: 11px; cursor: pointer; background: #fff; color: #374151;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); flex-shrink: 0;
+    transition: all 0.2s; position: relative; line-height: 1.3;
+    text-align: center;
   }
   .month-btn.selected { color: #fff; font-weight: 700; }
   .month-btn.now-dot::after {
-    content: '';
-    position: absolute;
-    top: 3px; right: 5px;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #22c55e;
+    content: ''; position: absolute; top: 3px; right: 4px;
+    width: 5px; height: 5px; border-radius: 50%; background: #22c55e;
   }
 
   .season-badge {
-    display: inline-flex;
-    align-items: center;
-    border-radius: 20px;
-    padding: 4px 14px;
-    margin-bottom: 12px;
-    font-size: 13px;
-    font-weight: 700;
-    border: 1.5px solid;
+    display: inline-flex; align-items: center; border-radius: 20px;
+    padding: 4px 14px; margin-bottom: 12px; font-size: 12px;
+    font-weight: 700; border: 1.5px solid;
   }
 
   .veg-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 12px 14px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
-    cursor: pointer;
-    margin-bottom: 10px;
-    border: 2px solid transparent;
-    transition: all 0.2s;
+    background: #fff; border-radius: 14px; padding: 12px 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07); cursor: pointer;
+    margin-bottom: 10px; border: 2px solid transparent; transition: all 0.2s;
   }
-  .veg-card-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .veg-emoji { font-size: 28px; }
+  .veg-card-header { display: flex; align-items: center; gap: 10px; }
+  .veg-emoji { font-size: 26px; }
   .veg-name { font-weight: 700; font-size: 15px; color: #111827; }
-  .tags { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
-  .tag {
-    border-radius: 8px;
-    padding: 2px 8px;
-    font-size: 11px;
-    font-weight: 600;
-    border: 1px solid;
-  }
-  .arrow { color: #9ca3af; font-size: 18px; margin-left: auto; }
-  .veg-detail {
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px solid #f3f4f6;
-    display: none;
-  }
+  .veg-name-sub { font-size: 11px; color: #9ca3af; font-weight: 400; margin-top: 1px; }
+  .tags { display: flex; gap: 5px; margin-top: 4px; flex-wrap: wrap; }
+  .tag { border-radius: 8px; padding: 2px 7px; font-size: 10px; font-weight: 600; border: 1px solid; }
+  .arrow { color: #9ca3af; font-size: 18px; margin-left: auto; flex-shrink: 0; }
+  .veg-detail { margin-top: 12px; padding-top: 10px; border-top: 1px solid #f3f4f6; display: none; }
   .veg-detail.open { display: block; }
-  .detail-note { font-size: 13px; color: #4b5563; margin-bottom: 8px; }
-  .detail-row { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .detail-note { font-size: 12px; color: #4b5563; margin-bottom: 6px; }
+  .detail-note-en { font-size: 11px; color: #9ca3af; margin-bottom: 8px; font-style: italic; }
+  .detail-row { font-size: 11px; color: #6b7280; margin-top: 2px; }
 
   .mini-labels { display: flex; gap: 2px; margin-top: 6px; margin-bottom: 2px; }
-  .mini-label { flex: 1; text-align: center; font-size: 9px; color: #9ca3af; }
+  .mini-label { flex: 1; text-align: center; font-size: 8px; color: #9ca3af; }
   .mini-label.now-label { color: #14532d; font-weight: 700; }
   .mini-bar { display: flex; gap: 2px; }
-  .mini-cell {
-    flex: 1;
-    height: 16px;
-    border-radius: 3px;
-    background: #f3f4f6;
-  }
+  .mini-cell { flex: 1; height: 14px; border-radius: 3px; background: #f3f4f6; }
   .mini-cell.sow { background: #86efac; }
   .mini-cell.seedling { background: #fcd34d; }
   .mini-cell.harvest { background: #fca5a5; }
   .mini-cell.now { outline: 2px solid #14532d; }
-  .mini-legend { display: flex; gap: 8px; margin-top: 3px; font-size: 10px; color: #9ca3af; }
+  .mini-legend { display: flex; gap: 8px; margin-top: 3px; font-size: 9px; color: #9ca3af; }
 
-  .empty { text-align: center; color: #9ca3af; padding: 32px; font-size: 14px; }
-  .footer { text-align: center; margin-top: 24px; font-size: 11px; color: #d1d5db; }
+  .empty { text-align: center; color: #9ca3af; padding: 32px; font-size: 13px; }
+  .footer { text-align: center; margin-top: 24px; font-size: 10px; color: #d1d5db; }
 </style>
 </head>
 <body>
 
 <header>
   <div class="icon">🌱</div>
-  <h1>野菜カレンダー</h1>
-  <p class="subtitle">種まき・苗・収穫の時期がひと目でわかる</p>
+  <h1 id="title-ja">野菜カレンダー<span>Vegetable Growing Calendar</span></h1>
+  <p class="subtitle" id="subtitle-text">種まき・苗・収穫の時期がひと目でわかる / Sowing · Seedling · Harvest at a glance</p>
 </header>
 
+<!-- Language toggle -->
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('ja')">🇯🇵 日本語</button>
+  <button class="lang-btn" onclick="setLang('en')">🇬🇧 English</button>
+  <button class="lang-btn" onclick="setLang('both')">両方 / Both</button>
+</div>
+
 <div class="tab-bar">
-  <button class="tab-btn active" onclick="switchTab('calendar')">📅 月別</button>
-  <button class="tab-btn" onclick="switchTab('list')">📋 野菜一覧</button>
+  <button class="tab-btn active" id="tab-calendar" onclick="switchTab('calendar')">📅 <span class="t" data-ja="月別" data-en="By Month"></span></button>
+  <button class="tab-btn" id="tab-list" onclick="switchTab('list')">📋 <span class="t" data-ja="野菜一覧" data-en="All Vegetables"></span></button>
 </div>
 
 <div id="calendar-view">
@@ -165,68 +147,62 @@
   <div id="all-veg-list"></div>
 </div>
 
-<div class="footer">※時期は関西〜関東標準の目安です</div>
+<div class="footer">※ Timing is approximate for Kansai–Kanto region / 関西〜関東標準の目安です</div>
 
 <script>
+let currentLang = 'ja';
+
 const vegetables = [
-  // 1月種まき
-  // 2月種まき
-  // 3月種まき
-  { name: "じゃがいも", emoji: "🥔", sow: [3], seedling: [], harvest: [6,7], notes: "種芋を使う。芽かきが大切。" },
-  { name: "アスパラガス", emoji: "🌱", sow: [3,4], seedling: [4,5], harvest: [4,5,6], notes: "定植後2〜3年から本格収穫。長期栽培作物。" },
-  { name: "トマト", emoji: "🍅", sow: [3,4], seedling: [4,5], harvest: [7,8,9], notes: "日当たり良い場所。水やりは土が乾いたら。" },
-  { name: "ナス", emoji: "🍆", sow: [3,4], seedling: [5,6], harvest: [7,8,9,10], notes: "肥料を定期的に。長期収穫できる。" },
-  { name: "ピーマン", emoji: "🫑", sow: [3,4], seedling: [5], harvest: [7,8,9], notes: "暑さに強い。実が付いたら早めに収穫。" },
-  { name: "ほうれん草", emoji: "🥬", sow: [3,4,9,10], seedling: [], harvest: [5,6,11,12], notes: "直まき向き。寒さに強い。" },
-  { name: "小松菜", emoji: "🥬", sow: [3,4,9,10], seedling: [], harvest: [5,6,11,12], notes: "病害虫に強く育てやすい。周年栽培可能。" },
-  { name: "レタス", emoji: "🥗", sow: [3,4,9], seedling: [4,5,10], harvest: [5,6,11], notes: "高温に弱い。春・秋が育てやすい。" },
-  { name: "ちしゃ", emoji: "🥬", sow: [3,4,9], seedling: [4,5], harvest: [5,6,10,11], notes: "レタスの仲間。直まきでも育てやすい。" },
-  { name: "三つ葉", emoji: "🌿", sow: [3,4,9], seedling: [], harvest: [5,6,10,11], notes: "半日陰でも育つ。香りが料理のアクセントに。" },
-  { name: "にんじん", emoji: "🥕", sow: [3,4,7,8], seedling: [], harvest: [6,7,10,11], notes: "直まき。発芽に水分が重要。" },
-  { name: "かぶ", emoji: "⚪", sow: [3,4,9,10], seedling: [], harvest: [5,6,11,12], notes: "直まき。間引きながら育てる。" },
-  { name: "二十日大根", emoji: "🔴", sow: [3,4,5,9,10], seedling: [], harvest: [4,5,6,10,11], notes: "約20〜30日で収穫。初心者におすすめ。" },
-  { name: "ニラ", emoji: "🌿", sow: [3,4], seedling: [], harvest: [5,6,7,8,9,10], notes: "一度植えると毎年収穫できる多年草。" },
-  { name: "ネギ", emoji: "🧅", sow: [3,4], seedling: [5,6], harvest: [10,11,12,1], notes: "長ネギ・万能ねぎなど種類が多い。土寄せが必要。" },
-  // 4月種まき
-  { name: "しょうが", emoji: "🫚", sow: [4,5], seedling: [], harvest: [10,11], notes: "種しょうがを植える。高温多湿を好む。" },
-  { name: "キュウリ", emoji: "🥒", sow: [4,5], seedling: [5,6], harvest: [7,8], notes: "支柱が必要。毎日水やりを。" },
-  { name: "ゴーヤ", emoji: "🟢", sow: [4,5], seedling: [5,6], harvest: [7,8,9], notes: "ネットに絡ませる。グリーンカーテンにも。" },
-  { name: "スイカ", emoji: "🍉", sow: [4], seedling: [5], harvest: [7,8], notes: "広いスペースが必要。受粉に注意。" },
-  { name: "メロン", emoji: "🍈", sow: [4], seedling: [5], harvest: [7,8], notes: "着果後は1株1〜2個に絞る。" },
-  { name: "なりくらまくわうり", emoji: "🍐", sow: [4,5], seedling: [5], harvest: [7,8], notes: "伝統的な東洋系メロン。暑さに強く育てやすい。" },
-  { name: "かぼちゃ", emoji: "🎃", sow: [4,5], seedling: [5], harvest: [8,9], notes: "つる性。広いスペースが必要。" },
-  { name: "大葉", emoji: "🌿", sow: [4,5], seedling: [5,6], harvest: [7,8,9,10], notes: "しそとも呼ばれる。薬味や料理に重宝。" },
-  { name: "赤紫蘇", emoji: "🌿", sow: [4,5], seedling: [5,6], harvest: [7,8], notes: "梅干しの色付けに。大葉と同じく育てやすい。" },
-  { name: "いんげん", emoji: "🫘", sow: [4,5,6], seedling: [], harvest: [6,7,8,9], notes: "つるあり・つるなし品種がある。暖かくなったら種まき。" },
-  { name: "米", emoji: "🌾", sow: [4,5], seedling: [5,6], harvest: [9,10], notes: "田植えは5〜6月。水管理が重要。" },
-  // 5月種まき
-  { name: "オクラ", emoji: "🌿", sow: [5,6], seedling: [], harvest: [7,8,9], notes: "暑さに強い。実が大きくなりすぎる前に収穫。" },
-  { name: "空心菜", emoji: "🌿", sow: [5,6], seedling: [], harvest: [7,8,9], notes: "暑い時期に旺盛に育つ。水を好む。" },
-  { name: "枝豆", emoji: "🫘", sow: [5,6], seedling: [], harvest: [8,9], notes: "直まき推奨。水やりをしっかり。" },
-  { name: "小豆", emoji: "🫘", sow: [5,6], seedling: [], harvest: [9,10], notes: "温暖地向き。収穫後は乾燥させる。" },
-  { name: "エゴマ", emoji: "🌿", sow: [5,6], seedling: [], harvest: [8,9], notes: "シソ科。葉・実ともに食べられる。" },
-  { name: "ローゼル", emoji: "🌺", sow: [5,6], seedling: [6], harvest: [10,11], notes: "ハイビスカスティーの原料。暑さに強い。" },
-  // 7月種まき
-  { name: "ブロッコリー", emoji: "🥦", sow: [7,8], seedling: [8,9], harvest: [11,12,1], notes: "秋まきがメイン。害虫に注意。" },
-  // 8月種まき
-  { name: "大根", emoji: "🫚", sow: [8,9], seedling: [], harvest: [11,12,1], notes: "直まき。間引きを忘れずに。" },
-  { name: "白菜", emoji: "🥬", sow: [8,9], seedling: [9,10], harvest: [11,12,1], notes: "秋まき主体。結球するまで水やり大切。" },
-  // 9月種まき
-  { name: "菊菜", emoji: "🌼", sow: [9,10], seedling: [], harvest: [11,12,1,2], notes: "冬の葉物。独特の香りが特徴。" },
-  { name: "高菜", emoji: "🥬", sow: [9,10], seedling: [], harvest: [12,1,2,3], notes: "寒さに強い。漬物に最適。" },
-  { name: "玉ねぎ", emoji: "🧅", sow: [9,10], seedling: [10,11], harvest: [5,6], notes: "秋まきで翌春〜初夏収穫。乾燥させて長期保存可。" },
-  // 10月種まき
-  { name: "えんどう", emoji: "🫛", sow: [10,11], seedling: [], harvest: [4,5,6], notes: "秋まきで越冬。サヤエンドウ・スナップ・実えんどうなど。" },
-  { name: "ニンニク", emoji: "🧄", sow: [10,11], seedling: [], harvest: [5,6], notes: "秋植えで翌春収穫。鱗片をひとつずつ植える。" },
-  { name: "麦", emoji: "🌾", sow: [10,11], seedling: [], harvest: [5,6], notes: "秋まきで越冬。大麦・小麦など。収穫後乾燥が必要。" },
+  { name: "じゃがいも", en: "Potato", emoji: "🥔", sow: [3], seedling: [], harvest: [6,7], notes: "種芋を使う。芽かきが大切。", notesEn: "Use seed potatoes. Remove extra sprouts." },
+  { name: "アスパラガス", en: "Asparagus", emoji: "🌱", sow: [3,4], seedling: [4,5], harvest: [4,5,6], notes: "定植後2〜3年から本格収穫。長期栽培作物。", notesEn: "Full harvest starts 2–3 years after planting." },
+  { name: "トマト", en: "Tomato", emoji: "🍅", sow: [3,4], seedling: [4,5], harvest: [7,8,9], notes: "日当たり良い場所。水やりは土が乾いたら。", notesEn: "Full sun. Water when soil is dry." },
+  { name: "ナス", en: "Eggplant", emoji: "🍆", sow: [3,4], seedling: [5,6], harvest: [7,8,9,10], notes: "肥料を定期的に。長期収穫できる。", notesEn: "Fertilize regularly. Long harvest season." },
+  { name: "ピーマン", en: "Bell Pepper", emoji: "🫑", sow: [3,4], seedling: [5], harvest: [7,8,9], notes: "暑さに強い。実が付いたら早めに収穫。", notesEn: "Heat-tolerant. Harvest promptly when fruits appear." },
+  { name: "ほうれん草", en: "Spinach", emoji: "🥬", sow: [3,4,9,10], seedling: [], harvest: [5,6,11,12], notes: "直まき向き。寒さに強い。", notesEn: "Direct sow. Cold-hardy." },
+  { name: "小松菜", en: "Komatsuna", emoji: "🥬", sow: [3,4,9,10], seedling: [], harvest: [5,6,11,12], notes: "病害虫に強く育てやすい。周年栽培可能。", notesEn: "Disease-resistant and easy to grow year-round." },
+  { name: "レタス", en: "Lettuce", emoji: "🥗", sow: [3,4,9], seedling: [4,5,10], harvest: [5,6,11], notes: "高温に弱い。春・秋が育てやすい。", notesEn: "Dislikes heat. Best in spring and autumn." },
+  { name: "ちしゃ", en: "Chisha Lettuce", emoji: "🥬", sow: [3,4,9], seedling: [4,5], harvest: [5,6,10,11], notes: "レタスの仲間。直まきでも育てやすい。", notesEn: "A type of lettuce. Easy to direct sow." },
+  { name: "三つ葉", en: "Mitsuba", emoji: "🌿", sow: [3,4,9], seedling: [], harvest: [5,6,10,11], notes: "半日陰でも育つ。香りが料理のアクセントに。", notesEn: "Grows in partial shade. Aromatic herb." },
+  { name: "にんじん", en: "Carrot", emoji: "🥕", sow: [3,4,7,8], seedling: [], harvest: [6,7,10,11], notes: "直まき。発芽に水分が重要。", notesEn: "Direct sow. Keep moist for germination." },
+  { name: "かぶ", en: "Turnip", emoji: "⚪", sow: [3,4,9,10], seedling: [], harvest: [5,6,11,12], notes: "直まき。間引きながら育てる。", notesEn: "Direct sow. Thin gradually as it grows." },
+  { name: "二十日大根", en: "Radish", emoji: "🔴", sow: [3,4,5,9,10], seedling: [], harvest: [4,5,6,10,11], notes: "約20〜30日で収穫。初心者におすすめ。", notesEn: "Ready in 20–30 days. Great for beginners." },
+  { name: "ニラ", en: "Chinese Chives", emoji: "🌿", sow: [3,4], seedling: [], harvest: [5,6,7,8,9,10], notes: "一度植えると毎年収穫できる多年草。", notesEn: "Perennial. Harvest every year once planted." },
+  { name: "ネギ", en: "Green Onion", emoji: "🧅", sow: [3,4], seedling: [5,6], harvest: [10,11,12,1], notes: "長ネギ・万能ねぎなど種類が多い。土寄せが必要。", notesEn: "Many varieties. Hill soil around stems." },
+  { name: "しょうが", en: "Ginger", emoji: "🫚", sow: [4,5], seedling: [], harvest: [10,11], notes: "種しょうがを植える。高温多湿を好む。", notesEn: "Plant seed ginger. Prefers warm, humid conditions." },
+  { name: "キュウリ", en: "Cucumber", emoji: "🥒", sow: [4,5], seedling: [5,6], harvest: [7,8], notes: "支柱が必要。毎日水やりを。", notesEn: "Needs support. Water daily." },
+  { name: "ゴーヤ", en: "Bitter Melon", emoji: "🟢", sow: [4,5], seedling: [5,6], harvest: [7,8,9], notes: "ネットに絡ませる。グリーンカーテンにも。", notesEn: "Train on a net. Great as a green curtain." },
+  { name: "スイカ", en: "Watermelon", emoji: "🍉", sow: [4], seedling: [5], harvest: [7,8], notes: "広いスペースが必要。受粉に注意。", notesEn: "Needs space. Hand-pollinate if needed." },
+  { name: "メロン", en: "Melon", emoji: "🍈", sow: [4], seedling: [5], harvest: [7,8], notes: "着果後は1株1〜2個に絞る。", notesEn: "Limit to 1–2 fruits per plant." },
+  { name: "なりくらまくわうり", en: "Narikura Makuwa Melon", emoji: "🍐", sow: [4,5], seedling: [5], harvest: [7,8], notes: "伝統的な東洋系メロン。暑さに強く育てやすい。", notesEn: "Traditional Oriental melon. Heat-tolerant." },
+  { name: "かぼちゃ", en: "Pumpkin", emoji: "🎃", sow: [4,5], seedling: [5], harvest: [8,9], notes: "つる性。広いスペースが必要。", notesEn: "Vining plant. Needs wide space." },
+  { name: "大葉", en: "Shiso (Green)", emoji: "🌿", sow: [4,5], seedling: [5,6], harvest: [7,8,9,10], notes: "しそとも呼ばれる。薬味や料理に重宝。", notesEn: "Also called green shiso. Essential herb." },
+  { name: "赤紫蘇", en: "Red Shiso", emoji: "🌿", sow: [4,5], seedling: [5,6], harvest: [7,8], notes: "梅干しの色付けに。大葉と同じく育てやすい。", notesEn: "Used to color umeboshi. Easy to grow." },
+  { name: "いんげん", en: "Green Bean", emoji: "🫘", sow: [4,5,6], seedling: [], harvest: [6,7,8,9], notes: "つるあり・つるなし品種がある。暖かくなったら種まき。", notesEn: "Bush or pole varieties. Sow after last frost." },
+  { name: "米", en: "Rice", emoji: "🌾", sow: [4,5], seedling: [5,6], harvest: [9,10], notes: "田植えは5〜6月。水管理が重要。", notesEn: "Transplant May–June. Water management is key." },
+  { name: "オクラ", en: "Okra", emoji: "🌿", sow: [5,6], seedling: [], harvest: [7,8,9], notes: "暑さに強い。実が大きくなりすぎる前に収穫。", notesEn: "Heat-loving. Harvest before pods get too large." },
+  { name: "空心菜", en: "Water Spinach", emoji: "🌿", sow: [5,6], seedling: [], harvest: [7,8,9], notes: "暑い時期に旺盛に育つ。水を好む。", notesEn: "Thrives in summer heat. Loves water." },
+  { name: "枝豆", en: "Edamame", emoji: "🫘", sow: [5,6], seedling: [], harvest: [8,9], notes: "直まき推奨。水やりをしっかり。", notesEn: "Direct sow recommended. Water generously." },
+  { name: "小豆", en: "Adzuki Bean", emoji: "🫘", sow: [5,6], seedling: [], harvest: [9,10], notes: "温暖地向き。収穫後は乾燥させる。", notesEn: "Warm climate crop. Dry after harvest." },
+  { name: "エゴマ", en: "Perilla (Egoma)", emoji: "🌿", sow: [5,6], seedling: [], harvest: [8,9], notes: "シソ科。葉・実ともに食べられる。", notesEn: "Shiso family. Both leaves and seeds are edible." },
+  { name: "ローゼル", en: "Roselle", emoji: "🌺", sow: [5,6], seedling: [6], harvest: [10,11], notes: "ハイビスカスティーの原料。暑さに強い。", notesEn: "Used for hibiscus tea. Heat-tolerant." },
+  { name: "ブロッコリー", en: "Broccoli", emoji: "🥦", sow: [7,8], seedling: [8,9], harvest: [11,12,1], notes: "秋まきがメイン。害虫に注意。", notesEn: "Mainly autumn sowing. Watch for pests." },
+  { name: "大根", en: "Daikon Radish", emoji: "🫚", sow: [8,9], seedling: [], harvest: [11,12,1], notes: "直まき。間引きを忘れずに。", notesEn: "Direct sow. Don't forget to thin." },
+  { name: "白菜", en: "Napa Cabbage", emoji: "🥬", sow: [8,9], seedling: [9,10], harvest: [11,12,1], notes: "秋まき主体。結球するまで水やり大切。", notesEn: "Mainly autumn sowing. Water until heading." },
+  { name: "菊菜", en: "Chrysanthemum Greens", emoji: "🌼", sow: [9,10], seedling: [], harvest: [11,12,1,2], notes: "冬の葉物。独特の香りが特徴。", notesEn: "Winter green. Distinctive aroma." },
+  { name: "高菜", en: "Takana Mustard", emoji: "🥬", sow: [9,10], seedling: [], harvest: [12,1,2,3], notes: "寒さに強い。漬物に最適。", notesEn: "Cold-hardy. Great for pickling." },
+  { name: "玉ねぎ", en: "Onion", emoji: "🧅", sow: [9,10], seedling: [10,11], harvest: [5,6], notes: "秋まきで翌春〜初夏収穫。乾燥させて長期保存可。", notesEn: "Sow in autumn, harvest spring–early summer." },
+  { name: "えんどう", en: "Pea", emoji: "🫛", sow: [10,11], seedling: [], harvest: [4,5,6], notes: "秋まきで越冬。サヤエンドウ・スナップ・実えんどうなど。", notesEn: "Overwinters. Snow peas, snap peas, shelling peas." },
+  { name: "ニンニク", en: "Garlic", emoji: "🧄", sow: [10,11], seedling: [], harvest: [5,6], notes: "秋植えで翌春収穫。鱗片をひとつずつ植える。", notesEn: "Plant in autumn, harvest spring. Plant each clove." },
+  { name: "麦", en: "Wheat / Barley", emoji: "🌾", sow: [10,11], seedling: [], harvest: [5,6], notes: "秋まきで越冬。大麦・小麦など。収穫後乾燥が必要。", notesEn: "Overwinters. Barley or wheat. Dry after harvest." },
 ];
 
-const months = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+const monthsJa = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+const monthsEn = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const seasons = [
-  { name: "春", months: [3,4,5], color: "#db2777", bg: "#fdf2f8" },
-  { name: "夏", months: [6,7,8], color: "#d97706", bg: "#fffbeb" },
-  { name: "秋", months: [9,10,11], color: "#ea580c", bg: "#fff7ed" },
-  { name: "冬", months: [12,1,2], color: "#2563eb", bg: "#eff6ff" },
+  { ja: "春", en: "Spring", months: [3,4,5], color: "#db2777", bg: "#fdf2f8" },
+  { ja: "夏", en: "Summer", months: [6,7,8], color: "#d97706", bg: "#fffbeb" },
+  { ja: "秋", en: "Autumn", months: [9,10,11], color: "#ea580c", bg: "#fff7ed" },
+  { ja: "冬", en: "Winter", months: [12,1,2], color: "#2563eb", bg: "#eff6ff" },
 ];
 
 const currentMonth = new Date().getMonth() + 1;
@@ -234,8 +210,23 @@ let selectedMonth = currentMonth;
 let currentTab = 'calendar';
 let openCard = {};
 
-function getSeason(m) {
-  return seasons.find(s => s.months.includes(m));
+function getSeason(m) { return seasons.find(s => s.months.includes(m)); }
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['ja','en','both'][i] === lang);
+  });
+  updateTranslations();
+  if (currentTab === 'calendar') renderCalendar();
+  else renderList();
+}
+
+function updateTranslations() {
+  document.querySelectorAll('.t').forEach(el => {
+    if (currentLang === 'en') el.textContent = el.dataset.en;
+    else el.textContent = el.dataset.ja;
+  });
 }
 
 function switchTab(tab) {
@@ -248,16 +239,32 @@ function switchTab(tab) {
   if (tab === 'list') renderList();
 }
 
+function vegDisplayName(v) {
+  if (currentLang === 'en') return v.en;
+  if (currentLang === 'both') return `${v.name} <span class="veg-name-sub">${v.en}</span>`;
+  return v.name;
+}
+
+function sowLabel() { return currentLang === 'en' ? '🌱 Sow' : '🌱 種まき'; }
+function seedlingLabel() { return currentLang === 'en' ? '🪴 Seedling' : '🪴 苗作り'; }
+function harvestLabel() { return currentLang === 'en' ? '🧺 Harvest' : '🧺 収穫'; }
+
+function monthLabel(m) {
+  if (currentLang === 'en') return monthsEn[m-1];
+  return m + '月';
+}
+
 function renderMonths() {
   const el = document.getElementById('month-scroll');
-  el.innerHTML = months.map((m, i) => {
+  el.innerHTML = Array.from({length:12}, (_,i) => {
     const mn = i + 1;
     const s = getSeason(mn);
     const isSelected = selectedMonth === mn;
     const isNow = currentMonth === mn;
-    return `<button class="month-btn ${isSelected ? 'selected' : ''} ${isNow && !isSelected ? 'now-dot' : ''}"
-      style="${isSelected ? `background:${s.color}; box-shadow: 0 2px 8px ${s.color}88;` : isNow ? 'background:#dcfce7;' : ''}"
-      onclick="selectMonth(${mn})">${m}</button>`;
+    const label = currentLang === 'en' ? monthsEn[i] : monthsJa[i];
+    return `<button class="month-btn ${isSelected?'selected':''} ${isNow&&!isSelected?'now-dot':''}"
+      style="${isSelected?`background:${s.color};box-shadow:0 2px 8px ${s.color}88;`:isNow?'background:#dcfce7;':''}"
+      onclick="selectMonth(${mn})">${label}</button>`;
   }).join('');
 }
 
@@ -270,7 +277,10 @@ function selectMonth(m) {
 function renderCalendar() {
   const s = getSeason(selectedMonth);
   const badge = document.getElementById('season-badge');
-  badge.textContent = `${selectedMonth}月 — ${s.name}の野菜`;
+  const mLabel = currentLang === 'en' ? monthsEn[selectedMonth-1] : selectedMonth + '月';
+  const sName = currentLang === 'en' ? s.en : s.ja;
+  badge.textContent = `${mLabel} — ${sName}`;
+  if (currentLang === 'both') badge.textContent = `${selectedMonth}月 ${monthsEn[selectedMonth-1]} — ${s.ja} ${s.en}`;
   badge.style.color = s.color;
   badge.style.borderColor = s.color;
   badge.style.background = s.bg;
@@ -281,7 +291,7 @@ function renderCalendar() {
 
   const el = document.getElementById('veg-list');
   if (vegList.length === 0) {
-    el.innerHTML = '<div class="empty">この月は作業時期の野菜がありません</div>';
+    el.innerHTML = `<div class="empty">${currentLang==='en' ? 'No vegetables this month' : 'この月は作業時期の野菜がありません'}</div>`;
     return;
   }
 
@@ -289,24 +299,33 @@ function renderCalendar() {
     const id = 'c_' + v.name;
     const isOpen = openCard[id];
     const tags = [
-      v.sow.includes(selectedMonth) ? `<span class="tag" style="background:#dcfce7;color:#16a34a;border-color:#86efac">🌱 種まき</span>` : '',
-      v.seedling.includes(selectedMonth) ? `<span class="tag" style="background:#fef3c7;color:#d97706;border-color:#fcd34d">🪴 苗作り</span>` : '',
-      v.harvest.includes(selectedMonth) ? `<span class="tag" style="background:#fee2e2;color:#dc2626;border-color:#fca5a5">🧺 収穫</span>` : '',
+      v.sow.includes(selectedMonth) ? `<span class="tag" style="background:#dcfce7;color:#16a34a;border-color:#86efac">${sowLabel()}</span>` : '',
+      v.seedling.includes(selectedMonth) ? `<span class="tag" style="background:#fef3c7;color:#d97706;border-color:#fcd34d">${seedlingLabel()}</span>` : '',
+      v.harvest.includes(selectedMonth) ? `<span class="tag" style="background:#fee2e2;color:#dc2626;border-color:#fca5a5">${harvestLabel()}</span>` : '',
     ].join('');
-    return `<div class="veg-card" onclick="toggleCard('${id}')" style="${isOpen ? `border-color:${s.color}` : ''}">
+
+    const sowStr = v.sow.length ? v.sow.map(m=>monthLabel(m)).join('・') : (currentLang==='en'?'Direct sow only':'直まきなし');
+    const seedStr = v.seedling.length ? v.seedling.map(m=>monthLabel(m)).join('・') : (currentLang==='en'?'Direct sow':'直まき推奨');
+    const harStr = v.harvest.map(m=>monthLabel(m)).join('・');
+
+    const noteText = currentLang === 'en' ? `💡 ${v.notesEn}`
+      : currentLang === 'both' ? `💡 ${v.notes}<div class="detail-note-en">${v.notesEn}</div>`
+      : `💡 ${v.notes}`;
+
+    return `<div class="veg-card" onclick="toggleCard('${id}')" style="${isOpen?`border-color:${s.color}`:''}">
       <div class="veg-card-header">
         <span class="veg-emoji">${v.emoji}</span>
         <div style="flex:1">
-          <div class="veg-name">${v.name}</div>
+          <div class="veg-name">${vegDisplayName(v)}</div>
           <div class="tags">${tags}</div>
         </div>
-        <span class="arrow">${isOpen ? '▲' : '▼'}</span>
+        <span class="arrow">${isOpen?'▲':'▼'}</span>
       </div>
-      <div class="veg-detail ${isOpen ? 'open' : ''}">
-        <p class="detail-note">💡 ${v.notes}</p>
-        <div class="detail-row">🌱 種まき: ${v.sow.length ? v.sow.map(m=>m+'月').join('・') : '直まきなし'}</div>
-        <div class="detail-row">🪴 苗: ${v.seedling.length ? v.seedling.map(m=>m+'月').join('・') : '直まき推奨'}</div>
-        <div class="detail-row">🧺 収穫: ${v.harvest.map(m=>m+'月').join('・')}</div>
+      <div class="veg-detail ${isOpen?'open':''}">
+        <div class="detail-note">${noteText}</div>
+        <div class="detail-row">🌱 ${currentLang==='en'?'Sow':'種まき'}: ${sowStr}</div>
+        <div class="detail-row">🪴 ${currentLang==='en'?'Seedling':'苗'}: ${seedStr}</div>
+        <div class="detail-row">🧺 ${currentLang==='en'?'Harvest':'収穫'}: ${harStr}</div>
       </div>
     </div>`;
   }).join('');
@@ -317,9 +336,10 @@ function renderList() {
   el.innerHTML = vegetables.map(v => {
     const id = 'l_' + v.name;
     const isOpen = openCard[id];
-    const monthLabels = Array.from({length:12}, (_,i) => {
+    const labels = Array.from({length:12}, (_,i) => {
       const m = i+1;
-      return `<div class="mini-label ${m===currentMonth?'now-label':''}">${m}</div>`;
+      const lbl = currentLang==='en' ? monthsEn[i].slice(0,1) : (m);
+      return `<div class="mini-label ${m===currentMonth?'now-label':''}">${lbl}</div>`;
     }).join('');
     const barCells = Array.from({length:12}, (_,i) => {
       const m = i+1;
@@ -328,22 +348,31 @@ function renderList() {
       else if (v.seedling.includes(m)) cls = 'seedling';
       else if (v.sow.includes(m)) cls = 'sow';
       if (m === currentMonth) cls += ' now';
-      return `<div class="mini-cell ${cls}" title="${m}月"></div>`;
+      return `<div class="mini-cell ${cls}"></div>`;
     }).join('');
+
+    const sowStr = v.sow.length ? v.sow.map(m=>monthLabel(m)).join('・') : '―';
+    const seedStr = v.seedling.length ? v.seedling.map(m=>monthLabel(m)).join('・') : (currentLang==='en'?'Direct':'直まき');
+    const harStr = v.harvest.map(m=>monthLabel(m)).join('・');
+    const noteText = currentLang === 'en' ? v.notesEn : currentLang === 'both' ? `${v.notes} / ${v.notesEn}` : v.notes;
+    const legendSow = currentLang==='en'?'🟢Sow':'🟢種まき';
+    const legendSeed = currentLang==='en'?'🟡Seedling':'🟡苗';
+    const legendHarv = currentLang==='en'?'🔴Harvest':'🔴収穫';
+
     return `<div class="veg-card" onclick="toggleCard('${id}')">
       <div class="veg-card-header">
         <span class="veg-emoji">${v.emoji}</span>
         <div style="flex:1">
-          <div class="veg-name">${v.name}</div>
-          <div class="mini-labels">${monthLabels}</div>
+          <div class="veg-name">${vegDisplayName(v)}</div>
+          <div class="mini-labels">${labels}</div>
           <div class="mini-bar">${barCells}</div>
-          <div class="mini-legend"><span>🟢種まき</span><span>🟡苗</span><span>🔴収穫</span></div>
+          <div class="mini-legend"><span>${legendSow}</span><span>${legendSeed}</span><span>${legendHarv}</span></div>
         </div>
-        <span class="arrow">${isOpen ? '▲' : '▼'}</span>
+        <span class="arrow">${isOpen?'▲':'▼'}</span>
       </div>
-      <div class="veg-detail ${isOpen ? 'open' : ''}">
-        <p class="detail-note">💡 ${v.notes}</p>
-        <div class="detail-row">🌱 種まき: ${v.sow.length ? v.sow.map(m=>m+'月').join('・') : '―'} ／ 🪴 苗: ${v.seedling.length ? v.seedling.map(m=>m+'月').join('・') : '直まき'} ／ 🧺 収穫: ${v.harvest.map(m=>m+'月').join('・')}</div>
+      <div class="veg-detail ${isOpen?'open':''}">
+        <div class="detail-note">💡 ${noteText}</div>
+        <div class="detail-row">🌱 ${currentLang==='en'?'Sow':'種まき'}: ${sowStr} ／ 🪴 ${currentLang==='en'?'Seedling':'苗'}: ${seedStr} ／ 🧺 ${currentLang==='en'?'Harvest':'収穫'}: ${harStr}</div>
       </div>
     </div>`;
   }).join('');
@@ -355,6 +384,7 @@ function toggleCard(id) {
   else renderList();
 }
 
+updateTranslations();
 renderMonths();
 renderCalendar();
 </script>
