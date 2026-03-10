@@ -115,6 +115,32 @@
 
   .empty { text-align: center; color: #9ca3af; padding: 32px; font-size: 13px; }
   .footer { text-align: center; margin-top: 24px; font-size: 10px; color: #d1d5db; }
+
+  .search-wrap {
+    position: relative; margin-bottom: 14px;
+  }
+  .search-input {
+    width: 100%; padding: 10px 16px 10px 38px;
+    border: 1.5px solid #d1d5db; border-radius: 12px;
+    font-size: 14px; color: #111827; background: #fff;
+    outline: none; transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .search-input:focus { border-color: #22c55e; }
+  .search-icon {
+    position: absolute; left: 12px; top: 50%;
+    transform: translateY(-50%); font-size: 15px; pointer-events: none;
+  }
+  .search-clear {
+    position: absolute; right: 10px; top: 50%;
+    transform: translateY(-50%); background: #e5e7eb;
+    border: none; border-radius: 50%; width: 20px; height: 20px;
+    font-size: 11px; cursor: pointer; color: #6b7280;
+    display: none; align-items: center; justify-content: center;
+  }
+  .search-result-badge {
+    font-size: 11px; color: #6b7280; margin-bottom: 8px;
+  }
 </style>
 </head>
 <body>
@@ -132,6 +158,21 @@
   <button class="lang-btn" onclick="setLang('both')">両方 / Both</button>
 </div>
 
+<!-- Search -->
+<div class="search-wrap">
+  <span class="search-icon">🔍</span>
+  <input class="search-input" id="search-input" type="text"
+    placeholder="野菜を検索 / Search vegetables..."
+    oninput="onSearch(this.value)">
+  <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+</div>
+
+<div id="search-results" style="display:none">
+  <div class="search-result-badge" id="search-badge"></div>
+  <div id="search-list"></div>
+</div>
+
+<div id="main-content">
 <div class="tab-bar">
   <button class="tab-btn active" id="tab-calendar" onclick="switchTab('calendar')">📅 <span class="t" data-ja="月別" data-en="By Month"></span></button>
   <button class="tab-btn" id="tab-list" onclick="switchTab('list')">📋 <span class="t" data-ja="野菜一覧" data-en="All Vegetables"></span></button>
@@ -146,6 +187,8 @@
 <div id="list-view" style="display:none">
   <div id="all-veg-list"></div>
 </div>
+
+</div><!-- end main-content -->
 
 <div class="footer">※ Timing is approximate for Kansai–Kanto region / 関西〜関東標準の目安です</div>
 
@@ -163,6 +206,8 @@ const vegetables = [
   { name: "キャベツ", en: "Cabbage", emoji: "🥬", sow: [3,4,7,8], seedling: [4,5,9,10], harvest: [6,7,11,12], notes: "春まきと秋まきがある。結球するまで害虫に注意。", notesEn: "Spring and autumn sowing. Watch for pests until heading." },
   { name: "ナス", en: "Eggplant", emoji: "🍆", sow: [3,4], seedling: [5,6], harvest: [7,8,9,10], notes: "肥料を定期的に。長期収穫できる。", notesEn: "Fertilize regularly. Long harvest season." },
   { name: "ピーマン", en: "Bell Pepper", emoji: "🫑", sow: [3,4], seedling: [5], harvest: [7,8,9], notes: "暑さに強い。実が付いたら早めに収穫。", notesEn: "Heat-tolerant. Harvest promptly when fruits appear." },
+  { name: "ししとう", en: "Shishito Pepper", emoji: "🫑", sow: [3,4], seedling: [5], harvest: [7,8,9,10], notes: "ピーマンの仲間。辛くなることもある。炒め物や焼き物に。", notesEn: "Related to bell pepper. Occasionally spicy. Great grilled or stir-fried." },
+  { name: "万願寺とうがらし", en: "Manganji Pepper", emoji: "🫑", sow: [3,4], seedling: [5], harvest: [7,8,9,10], notes: "京野菜の代表格。肉厚で甘みが強い。種を取って焼くだけでおいしい。", notesEn: "Kyoto specialty. Thick flesh, sweet flavor. Delicious simply grilled." },
   { name: "ほうれん草", en: "Spinach", emoji: "🥬", sow: [3,4,9,10], seedling: [], harvest: [5,6,11,12], notes: "直まき向き。寒さに強い。", notesEn: "Direct sow. Cold-hardy." },
   { name: "小松菜", en: "Komatsuna", emoji: "🥬", sow: [3,4,9,10], seedling: [], harvest: [5,6,11,12], notes: "病害虫に強く育てやすい。周年栽培可能。", notesEn: "Disease-resistant and easy to grow year-round." },
   { name: "水菜", en: "Mizuna", emoji: "🥬", sow: [3,4,9,10], seedling: [], harvest: [5,6,11,12], notes: "直まき。生育が早く育てやすい。サラダや鍋に。", notesEn: "Direct sow. Fast-growing. Great for salads and hot pot." },
@@ -193,6 +238,9 @@ const vegetables = [
   { name: "米", en: "Rice", emoji: "🌾", sow: [4,5], seedling: [5,6], harvest: [9,10], notes: "田植えは5〜6月。水管理が重要。", notesEn: "Transplant May–June. Water management is key." },
   // 5月〜
   { name: "オクラ", en: "Okra", emoji: "🌿", sow: [5,6], seedling: [], harvest: [7,8,9], notes: "暑さに強い。実が大きくなりすぎる前に収穫。", notesEn: "Heat-loving. Harvest before pods get too large." },
+  { name: "白オクラ", en: "White Okra", emoji: "🤍", sow: [5,6], seedling: [], harvest: [7,8,9], notes: "緑オクラより柔らかくアクが少ない。生でも食べられる。", notesEn: "Softer and less bitter than green okra. Can be eaten raw." },
+  { name: "ダビデの星（スターオブデイビッド）", en: "Star of David Okra", emoji: "⭐", sow: [5,6], seedling: [], harvest: [7,8,9], notes: "断面が六角形の珍しいオクラ。大きくなっても柔らかく食べやすい。", notesEn: "Unique hexagonal cross-section. Stays tender even when large." },
+  { name: "ささげ", en: "Black-eyed Pea (Sasage)", emoji: "🫘", sow: [5,6], seedling: [], harvest: [8,9], notes: "暑さに強い。さやごと若採りも、豆を乾燥させても食べられる。", notesEn: "Heat-tolerant. Eat young pods or dry the beans." },
   { name: "空心菜", en: "Water Spinach", emoji: "🌿", sow: [5,6], seedling: [], harvest: [7,8,9], notes: "暑い時期に旺盛に育つ。水を好む。", notesEn: "Thrives in summer heat. Loves water." },
   { name: "枝豆", en: "Edamame", emoji: "🫘", sow: [5,6], seedling: [], harvest: [8,9], notes: "直まき推奨。水やりをしっかり。", notesEn: "Direct sow recommended. Water generously." },
   { name: "小豆", en: "Adzuki Bean", emoji: "🫘", sow: [5,6], seedling: [], harvest: [9,10], notes: "温暖地向き。収穫後は乾燥させる。", notesEn: "Warm climate crop. Dry after harvest." },
@@ -231,6 +279,7 @@ const currentMonth = new Date().getMonth() + 1;
 let selectedMonth = currentMonth;
 let currentTab = 'calendar';
 let openCard = {};
+let searchQuery = '';
 
 function getSeason(m) { return seasons.find(s => s.months.includes(m)); }
 
@@ -240,8 +289,13 @@ function setLang(lang) {
     b.classList.toggle('active', ['ja','en','both'][i] === lang);
   });
   updateTranslations();
-  if (currentTab === 'calendar') renderCalendar();
-  else renderList();
+  if (searchQuery) {
+    renderSearch();
+  } else if (currentTab === 'calendar') {
+    renderCalendar();
+  } else {
+    renderList();
+  }
 }
 
 function updateTranslations() {
@@ -265,6 +319,68 @@ function vegDisplayName(v) {
   if (currentLang === 'en') return v.en;
   if (currentLang === 'both') return `${v.name} <span class="veg-name-sub">${v.en}</span>`;
   return v.name;
+}
+
+function onSearch(val) {
+  searchQuery = val.trim();
+  const clearBtn = document.getElementById('search-clear');
+  clearBtn.style.display = searchQuery ? 'flex' : 'none';
+  if (searchQuery) {
+    document.getElementById('search-results').style.display = '';
+    document.getElementById('main-content').style.display = 'none';
+    renderSearch();
+  } else {
+    document.getElementById('search-results').style.display = 'none';
+    document.getElementById('main-content').style.display = '';
+  }
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  onSearch('');
+}
+
+function renderSearch() {
+  const q = searchQuery.toLowerCase();
+  const matched = vegetables.filter(v =>
+    v.name.toLowerCase().includes(q) || v.en.toLowerCase().includes(q)
+  );
+  const badge = document.getElementById('search-badge');
+  badge.textContent = currentLang === 'en'
+    ? `${matched.length} result(s) for "${searchQuery}"`
+    : `「${searchQuery}」の検索結果：${matched.length}件`;
+
+  const el = document.getElementById('search-list');
+  if (matched.length === 0) {
+    el.innerHTML = `<div class="empty">${currentLang==='en' ? 'No results found' : '見つかりませんでした'}</div>`;
+    return;
+  }
+  el.innerHTML = matched.map(v => {
+    const id = 's_' + v.name;
+    const isOpen = openCard[id];
+    const sowStr = v.sow.length ? v.sow.map(m=>monthLabel(m)).join('・') : '―';
+    const seedStr = v.seedling.length ? v.seedling.map(m=>monthLabel(m)).join('・') : (currentLang==='en'?'Direct':'直まき');
+    const harStr = v.harvest.map(m=>monthLabel(m)).join('・');
+    const noteText = currentLang === 'en' ? `💡 ${v.notesEn}`
+      : currentLang === 'both' ? `💡 ${v.notes}<div class="detail-note-en">${v.notesEn}</div>`
+      : `💡 ${v.notes}`;
+    return `<div class="veg-card" onclick="toggleCard('${id}')">
+      <div class="veg-card-header">
+        <span class="veg-emoji">${v.emoji}</span>
+        <div style="flex:1">
+          <div class="veg-name">${vegDisplayName(v)}</div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:2px;">🌱 ${sowStr} ／ 🧺 ${harStr}</div>
+        </div>
+        <span class="arrow">${isOpen?'▲':'▼'}</span>
+      </div>
+      <div class="veg-detail ${isOpen?'open':''}">
+        <div class="detail-note">${noteText}</div>
+        <div class="detail-row">🌱 ${currentLang==='en'?'Sow':'種まき'}: ${sowStr}</div>
+        <div class="detail-row">🪴 ${currentLang==='en'?'Seedling':'苗'}: ${seedStr}</div>
+        <div class="detail-row">🧺 ${currentLang==='en'?'Harvest':'収穫'}: ${harStr}</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function sowLabel() { return currentLang === 'en' ? '🌱 Sow' : '🌱 種まき'; }
@@ -325,15 +441,12 @@ function renderCalendar() {
       v.seedling.includes(selectedMonth) ? `<span class="tag" style="background:#fef3c7;color:#d97706;border-color:#fcd34d">${seedlingLabel()}</span>` : '',
       v.harvest.includes(selectedMonth) ? `<span class="tag" style="background:#fee2e2;color:#dc2626;border-color:#fca5a5">${harvestLabel()}</span>` : '',
     ].join('');
-
-    const sowStr = v.sow.length ? v.sow.map(m=>monthLabel(m)).join('・') : (currentLang==='en'?'Direct sow only':'直まきなし');
-    const seedStr = v.seedling.length ? v.seedling.map(m=>monthLabel(m)).join('・') : (currentLang==='en'?'Direct sow':'直まき推奨');
+    const sowStr = v.sow.length ? v.sow.map(m=>monthLabel(m)).join('・') : '―';
+    const seedStr = v.seedling.length ? v.seedling.map(m=>monthLabel(m)).join('・') : (currentLang==='en'?'Direct':'直まき');
     const harStr = v.harvest.map(m=>monthLabel(m)).join('・');
-
     const noteText = currentLang === 'en' ? `💡 ${v.notesEn}`
       : currentLang === 'both' ? `💡 ${v.notes}<div class="detail-note-en">${v.notesEn}</div>`
       : `💡 ${v.notes}`;
-
     return `<div class="veg-card" onclick="toggleCard('${id}')" style="${isOpen?`border-color:${s.color}`:''}">
       <div class="veg-card-header">
         <span class="veg-emoji">${v.emoji}</span>
@@ -360,7 +473,7 @@ function renderList() {
     const isOpen = openCard[id];
     const labels = Array.from({length:12}, (_,i) => {
       const m = i+1;
-      const lbl = currentLang==='en' ? monthsEn[i].slice(0,1) : (m);
+      const lbl = currentLang==='en' ? monthsEn[i].slice(0,1) : m;
       return `<div class="mini-label ${m===currentMonth?'now-label':''}">${lbl}</div>`;
     }).join('');
     const barCells = Array.from({length:12}, (_,i) => {
@@ -372,7 +485,6 @@ function renderList() {
       if (m === currentMonth) cls += ' now';
       return `<div class="mini-cell ${cls}"></div>`;
     }).join('');
-
     const sowStr = v.sow.length ? v.sow.map(m=>monthLabel(m)).join('・') : '―';
     const seedStr = v.seedling.length ? v.seedling.map(m=>monthLabel(m)).join('・') : (currentLang==='en'?'Direct':'直まき');
     const harStr = v.harvest.map(m=>monthLabel(m)).join('・');
@@ -380,7 +492,6 @@ function renderList() {
     const legendSow = currentLang==='en'?'🟢Sow':'🟢種まき';
     const legendSeed = currentLang==='en'?'🟡Seedling':'🟡苗';
     const legendHarv = currentLang==='en'?'🔴Harvest':'🔴収穫';
-
     return `<div class="veg-card" onclick="toggleCard('${id}')">
       <div class="veg-card-header">
         <span class="veg-emoji">${v.emoji}</span>
@@ -402,7 +513,8 @@ function renderList() {
 
 function toggleCard(id) {
   openCard[id] = !openCard[id];
-  if (currentTab === 'calendar') renderCalendar();
+  if (id.startsWith('s_')) renderSearch();
+  else if (currentTab === 'calendar') renderCalendar();
   else renderList();
 }
 
