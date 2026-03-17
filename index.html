@@ -99,12 +99,12 @@
   .arrow { color: #9ca3af; font-size: 20px; margin-left: auto; flex-shrink: 0; }
   .veg-detail { margin-top: 12px; padding-top: 10px; border-top: 1px solid #f3f4f6; display: none; }
   .veg-detail.open { display: block; }
-  .detail-note { font-size: 14px; color: #4b5563; margin-bottom: 6px; line-height: 1.7; }
-  .detail-note-en { font-size: 13px; color: #9ca3af; margin-bottom: 8px; font-style: italic; }
-  .detail-row { font-size: 13px; color: #6b7280; margin-top: 4px; }
-  .detail-recipe { font-size: 14px; color: #b45309; margin-top: 9px; line-height: 1.7; }
+  .detail-note { font-size: 16px; color: #4b5563; margin-bottom: 6px; line-height: 1.8; }
+  .detail-note-en { font-size: 14px; color: #9ca3af; margin-bottom: 8px; font-style: italic; }
+  .detail-row { font-size: 15px; color: #6b7280; margin-top: 4px; }
+  .detail-recipe { font-size: 15px; color: #b45309; margin-top: 9px; line-height: 1.8; }
   .detail-recipe a { color: #b45309; }
-  .detail-storage { font-size: 14px; color: #1d4ed8; margin-top: 6px; line-height: 1.7; }
+  .detail-storage { font-size: 15px; color: #1d4ed8; margin-top: 6px; line-height: 1.8; }
 
   .mini-labels { display: flex; gap: 2px; margin-top: 6px; margin-bottom: 2px; }
   .mini-label { flex: 1; text-align: center; font-size: 9px; color: #9ca3af; }
@@ -370,11 +370,28 @@ function clearSearch() {
   onSearch('');
 }
 
+// ひらがな→カタカナ、カタカナ→ひらがな変換
+function toKatakana(str) {
+  return str.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
+}
+function toHiragana(str) {
+  return str.replace(/[\u30A1-\u30F6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+}
+function normalizeQuery(str) {
+  return toHiragana(str.toLowerCase());
+}
+function normalizeTarget(str) {
+  return toHiragana(str.toLowerCase());
+}
+
 function renderSearch() {
-  const q = searchQuery.toLowerCase();
-  const matched = vegetables.filter(v =>
-    v.name.toLowerCase().includes(q) || v.en.toLowerCase().includes(q)
-  );
+  const q = normalizeQuery(searchQuery);
+  const matched = vegetables.filter(v => {
+    const name = normalizeTarget(v.name);
+    const en = v.en.toLowerCase();
+    const notes = normalizeTarget(v.notes || '');
+    return name.includes(q) || en.includes(q) || notes.includes(q);
+  });
   const badge = document.getElementById('search-badge');
   badge.textContent = currentLang === 'en'
     ? `${matched.length} result(s) for "${searchQuery}"`
