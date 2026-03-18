@@ -1328,13 +1328,39 @@ function toggleCard(id) {
   else if (id.startsWith('ch_') || id.startsWith('cw_') || id.startsWith('cf_')) renderCalendar();
   else if (currentTab === 'calendar') renderCalendar();
   else renderList();
+
   if (openCard[id]) {
     const name = id.replace(/^[a-z]+_/, '');
     const allItems = [...vegetables, ...herbs, ...weeds, ...fruitTrees];
     const item = allItems.find(v => v.name === name);
-    if (item && item.noImage) return; // 画像なし指定
-    const wikiSearch = item && item.wikiSearch ? item.wikiSearch : undefined;
-    fetchWikiImage(name, id, wikiSearch);
+
+    // 画像取得
+    if (!item || !item.noImage) {
+      const wikiSearch = item && item.wikiSearch ? item.wikiSearch : undefined;
+      fetchWikiImage(name, id, wikiSearch);
+    }
+
+    // 開いたカードの詳細部分までスクロール
+    setTimeout(() => {
+      // カードを探す
+      const allCards = document.querySelectorAll('.veg-card');
+      let targetCard = null;
+      for (const card of allCards) {
+        const onclick = card.getAttribute('onclick') || '';
+        if (onclick.includes(`'${id}'`)) {
+          targetCard = card;
+          break;
+        }
+      }
+      if (targetCard) {
+        // カードの詳細部分（開いた内容）の先頭に移動
+        const detail = targetCard.querySelector('.veg-detail');
+        const scrollTarget = detail || targetCard;
+        const rect = scrollTarget.getBoundingClientRect();
+        const offset = window.scrollY + rect.top - 80; // ヘッダー分のオフセット
+        window.scrollTo({ top: offset, behavior: 'smooth' });
+      }
+    }, 60);
   }
 }
 
