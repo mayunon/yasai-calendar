@@ -1162,10 +1162,11 @@ function renderCalendar() {
         const wikiSearch = item && item.wikiSearch ? item.wikiSearch : undefined;
         fetchWikiImage(id.replace(/^[a-z]+_/, ''), 'cp_' + id, wikiSearch);
       }
-      // タイルが入っているセクションを画面上部へスクロール
+      // 詳細パネル自体を画面上部へスクロール
       setTimeout(() => {
-        tile.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setTimeout(() => window.scrollBy({ top: -70, behavior: 'smooth' }), 300);
+        const rect = panel.getBoundingClientRect();
+        const scrollTop = window.scrollY + rect.top - 16;
+        window.scrollTo({ top: scrollTop, behavior: 'smooth' });
       }, 80);
     }
   }
