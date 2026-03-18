@@ -1181,7 +1181,21 @@ function renderCalendar() {
     const noteText = currentLang === 'en' ? `💡 ${v.notesEn||v.notes}`
       : currentLang === 'both' && v.notesEn ? `💡 ${v.notes}<div class="detail-note-en">${v.notesEn}</div>`
       : `💡 ${v.notes}`;
-    return `<div id="img_cp_${id}" class="wiki-img-wrap"></div>
+    const displayName = currentLang==='en' ? (v.en||v.name) : currentLang==='both'&&v.en ? `${v.name} <span class="veg-name-sub">${v.en}</span>` : v.name;
+    const barHtml = (() => {
+      const labels = Array.from({length:12},(_,i)=>{const m=i+1;const lbl=currentLang==='en'?monthsEn[i].slice(0,1):m;return `<div class="mini-label ${m===currentMonth?'now-label':''}">${lbl}</div>`;}).join('');
+      const cells = Array.from({length:12},(_,i)=>{const m=i+1;let cls=v.harvest.includes(m)?'harvest':v.seedling.includes(m)?'seedling':v.sow.includes(m)?'sow':'';if(m===currentMonth)cls+=' now';return `<div class="mini-cell ${cls}"></div>`;}).join('');
+      const lg1=currentLang==='en'?'🟢Sow':'🟢種まき'; const lg2=currentLang==='en'?'🟡Transplant':'🟡苗'; const lg3=currentLang==='en'?'🔴Harvest':'🔴収穫';
+      return `<div class="mini-labels">${labels}</div><div class="mini-bar">${cells}</div><div class="mini-legend"><span>${lg1}</span><span>${lg2}</span><span>${lg3}</span></div>`;
+    })();
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #f3f4f6;">
+        <span style="font-size:28px;">${v.emoji}</span>
+        <div style="flex:1">
+          <div class="veg-name">${displayName}</div>
+          ${barHtml}
+        </div>
+      </div>
+      <div id="img_cp_${id}" class="wiki-img-wrap"></div>
       <div class="detail-note">${noteText}</div>
       <div class="detail-row">🌱 ${currentLang==='en'?'Sow':'種まき'}: ${sowStr}</div>
       <div class="detail-row">🪴 ${currentLang==='en'?'Seedling':'苗の植え付け'}: ${seedStr}</div>
@@ -1195,19 +1209,41 @@ function renderCalendar() {
     const noteText = currentLang === 'en' ? (item.notesEn || item.notes)
       : currentLang === 'both' && item.notesEn ? `${item.notes}<div class="detail-note-en">${item.notesEn}</div>`
       : item.notes;
-    return `<div id="img_cp_${id}" class="wiki-img-wrap"></div>
+    const displayName = currentLang==='en' ? (item.en||item.name) : currentLang==='both'&&item.en ? `${item.name} <span class="veg-name-sub">${item.en}</span>` : item.name;
+    const barHtml = item.months && item.months.length ? makeMiniBar(item.months, 'harvest', currentLang==='en'?'🟠Active season':'🟠見られる時期') : '';
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #f3f4f6;">
+        <span style="font-size:28px;">${item.emoji}</span>
+        <div style="flex:1">
+          <div class="veg-name">${displayName}</div>
+          ${barHtml}
+        </div>
+      </div>
+      <div id="img_cp_${id}" class="wiki-img-wrap"></div>
       <div class="detail-note">💡 ${noteText}</div>
       ${item.season ? `<div class="detail-row">🗓 ${item.season}</div>` : ''}
       ${item.use ? `<div class="detail-row">💊 ${currentLang==='en'?'Uses':'利用部位'}: ${item.use}</div>` : ''}
-      ${item.type ? `<div class="detail-row">📍 ${item.type}</div>` : ''}`;
+      ${item.type ? `<div class="detail-row">📍 ${item.type}</div>` : ''}
+      ${item.recipe ? `<div class="detail-recipe">🍳 ${item.recipe}</div>` : ''}
+      ${item.storage ? `<div class="detail-storage">📦 ${item.storage}</div>` : ''}`;
   }
 
   // 果樹の詳細
   function fruitDetail(f, id) {
     const noteText = currentLang === 'en' ? (f.notesEn || f.notes) : f.notes;
     const harStr = f.harvest.map(m => monthLabel(m)).join('・');
-    return `<div id="img_cp_${id}" class="wiki-img-wrap"></div>
+    const plantStr = f.plant.map(m => monthLabel(m)).join('・');
+    const displayName = currentLang==='en' ? (f.en||f.name) : currentLang==='both'&&f.en ? `${f.name} <span class="veg-name-sub">${f.en}</span>` : f.name;
+    const barHtml = makeFruitMiniBar(f.plant||[], f.harvest||[]);
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #f3f4f6;">
+        <span style="font-size:28px;">${f.emoji}</span>
+        <div style="flex:1">
+          <div class="veg-name">${displayName}</div>
+          ${barHtml}
+        </div>
+      </div>
+      <div id="img_cp_${id}" class="wiki-img-wrap"></div>
       <div class="detail-note">💡 ${noteText}</div>
+      <div class="detail-row">🌱 ${currentLang==='en'?'Plant':'植え付け'}: ${plantStr}</div>
       <div class="detail-row">🧺 ${currentLang==='en'?'Harvest':'収穫'}: ${harStr}</div>
       <div class="detail-row">📏 ${currentLang==='en'?'Height':'標準樹高'}: ${f.height}</div>`;
   }
