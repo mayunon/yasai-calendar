@@ -555,7 +555,7 @@ function makeSimpleCard(item, prefix) {
         currentLang==='en' ? '🟠Active season' : '🟠見られる時期'
       )
     : '';
-  return `<div class="veg-card" onclick="toggleCard('${id}')">
+  return `<div class="veg-card" onclick="toggleCard('${id}')" data-card-id="${id}">
     <div class="veg-card-header">
       <span class="veg-emoji">${item.emoji}</span>
       <div style="flex:1">
@@ -684,7 +684,7 @@ function renderPerennials() {
       } else if (srcFruit) {
         barHtml = makeFruitMiniBar(srcFruit.plant || [], srcFruit.harvest || []);
       }
-      return `<div class="veg-card" onclick="toggleCard('${id}')">
+      return `<div class="veg-card" onclick="toggleCard('${id}')" data-card-id="${id}">
         <div class="veg-card-header">
           <span class="veg-emoji">${p.emoji}</span>
           <div style="flex:1">
@@ -802,7 +802,7 @@ function renderFruitTrees() {
       const noteText = currentLang === 'en' ? (f.notesEn || f.notes) : f.notes;
       const plantStr = f.plant.map(m => monthLabel(m)).join('・');
       const harvestStr = f.harvest.map(m => monthLabel(m)).join('・');
-      return `<div class="veg-card" onclick="toggleCard('${id}')">
+      return `<div class="veg-card" onclick="toggleCard('${id}')" data-card-id="${id}">
         <div class="veg-card-header">
           <span class="veg-emoji">${f.emoji}</span>
           <div style="flex:1">
@@ -1162,6 +1162,11 @@ function renderCalendar() {
         const wikiSearch = item && item.wikiSearch ? item.wikiSearch : undefined;
         fetchWikiImage(id.replace(/^[a-z]+_/, ''), 'cp_' + id, wikiSearch);
       }
+      // タイルが入っているセクションを画面上部へスクロール
+      setTimeout(() => {
+        tile.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => window.scrollBy({ top: -70, behavior: 'smooth' }), 300);
+      }, 80);
     }
   }
   // グローバルに登録
@@ -1295,7 +1300,7 @@ function renderList() {
     const legendSow = currentLang==='en'?'🟢Sow':'🟢種まき';
     const legendSeed = currentLang==='en'?'🟡Transplant':'🟡苗';
     const legendHarv = currentLang==='en'?'🔴Harvest':'🔴収穫';
-    return `<div class="veg-card" onclick="toggleCard('${id}')">
+    return `<div class="veg-card" onclick="toggleCard('${id}')" data-card-id="${id}">
       <div class="veg-card-header">
         <span class="veg-emoji">${v.emoji}</span>
         <div style="flex:1">
@@ -1340,27 +1345,26 @@ function toggleCard(id) {
       fetchWikiImage(name, id, wikiSearch);
     }
 
-    // 開いたカードの詳細部分までスクロール
+    // 開いたカードを画面上部に表示
     setTimeout(() => {
-      // カードを探す
-      const allCards = document.querySelectorAll('.veg-card');
+      // data-card-id でカードを特定
       let targetCard = null;
+      const allCards = document.querySelectorAll('.veg-card[data-card-id]');
       for (const card of allCards) {
-        const onclick = card.getAttribute('onclick') || '';
-        if (onclick.includes(`'${id}'`)) {
+        if (card.getAttribute('data-card-id') === id) {
           targetCard = card;
           break;
         }
       }
       if (targetCard) {
-        // カードの詳細部分（開いた内容）の先頭に移動
-        const detail = targetCard.querySelector('.veg-detail');
-        const scrollTarget = detail || targetCard;
-        const rect = scrollTarget.getBoundingClientRect();
-        const offset = window.scrollY + rect.top - 80; // ヘッダー分のオフセット
-        window.scrollTo({ top: offset, behavior: 'smooth' });
+        // カード全体を画面上部へ（block: 'start' でカード頭を上に）
+        targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // さらに少し上にオフセット（検索バーなどの分）
+        setTimeout(() => {
+          window.scrollBy({ top: -70, behavior: 'smooth' });
+        }, 300);
       }
-    }, 60);
+    }, 150);
   }
 }
 
